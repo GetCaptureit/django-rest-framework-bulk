@@ -24,7 +24,7 @@ Requirements
 
 * Python (2.6, 2.7 and 3.3)
 * Django 1.3+
-* Django REST Framework >= 2.2.5 (when bulk features were added to serializers)
+* Django REST Framework >= 3.0.0
 
 Installing
 ----------
@@ -44,8 +44,27 @@ The bulk views (and mixins) are very similar to Django REST Framework's own
 generic views (and mixins)::
 
     from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
+
     class FooView(ListBulkCreateUpdateDestroyAPIView):
-        model = FooModel
+        queryset = FooModel.objects.all()
+        serializer_class = FooModelSerializer
+
+where `FooModelSerializer` is defined as::
+
+    from rest_framework_bulk.serializers import BulkListSerializer, BulkSerializerMixin
+    from rest_framework.serializers import ModelSerializer
+
+    class FooModelSerializer(BulkSerializerMixin, ModelSerializer):
+        class Meta:
+            model = FooModel
+            list_serializer_class = BulkListSerializer
+
+A `list_serializer_class` definition has become necessary due to API changes in the Django REST Framework 3.0 regarding
+multiple updates
+(see `ListSerializer in the docs <http://www.django-rest-framework.org/api-guide/serializers/#listserializer>`_ for
+details). The additional serializer mixin temporarily adds a unique field to the deserialized values for determining
+which instance to update, as read-only fields are otherwise discarded. By default the `id` field is used, but can be
+set by overriding the `update_lookup_field` class attribute.
 
 The above will allow to create the following queries
 
