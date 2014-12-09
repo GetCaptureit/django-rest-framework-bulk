@@ -57,7 +57,7 @@ setup(
     package_data=get_package_data('rest_framework_bulk'),
     install_requires=[
         'django',
-        'djangorestframework',
+        'djangorestframework>=3.0.0',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
