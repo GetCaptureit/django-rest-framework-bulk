@@ -59,12 +59,12 @@ where `FooModelSerializer` is defined as::
             model = FooModel
             list_serializer_class = BulkListSerializer
 
-A `list_serializer_class` definition has become necessary due to API changes in the Django REST Framework 3.0 regarding
-multiple updates
+A ``list_serializer_class`` definition has become necessary due to API changes in the Django REST Framework 3.0
+regarding multiple updates
 (see `ListSerializer in the docs <http://www.django-rest-framework.org/api-guide/serializers/#listserializer>`_ for
 details). The additional serializer mixin temporarily adds a unique field to the deserialized values for determining
-which instance to update, as read-only fields are otherwise discarded. By default the `id` field is used, but can be
-set by overriding the `update_lookup_field` class attribute.
+which instance to update, as read-only fields are otherwise discarded. By default the ``id`` field is used, but can be
+set by overriding the ``update_lookup_field`` class attribute.
 
 The above will allow to create the following queries
 
