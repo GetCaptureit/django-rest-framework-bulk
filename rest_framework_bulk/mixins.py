@@ -25,7 +25,7 @@ class BulkCreateModelMixin(CreateModelMixin):
             return super(BulkCreateModelMixin, self).create(request, *args, **kwargs)
 
         else:
-            serializer = self.get_serializer(data=request.DATA, many=True)
+            serializer = self.get_serializer(data=request.data, many=True)
             if serializer.is_valid():
                 self.perform_create(serializer)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -50,7 +50,7 @@ class BulkUpdateModelMixin(object):
 
         # restrict the update to the filtered queryset
         serializer = self.get_serializer(self.filter_queryset(self.get_queryset()),
-                                         data=request.DATA,
+                                         data=request.data,
                                          many=True,
                                          partial=partial)
 
