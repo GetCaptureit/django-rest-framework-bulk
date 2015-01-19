@@ -1,6 +1,7 @@
 from rest_framework_bulk import generics
-from . import models
+from . import models, serializers
 
 
 class SimpleBulkUpdateAPIView (generics.BulkUpdateAPIView):
-    model = models.SimpleModel
+    queryset = models.SimpleModel.objects.all()
+    serializer_class = serializers.SimpleModelSerializer

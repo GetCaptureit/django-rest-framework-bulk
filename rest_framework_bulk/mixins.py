@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, print_function
-from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
@@ -26,14 +25,15 @@ class BulkCreateModelMixin(CreateModelMixin):
             return super(BulkCreateModelMixin, self).create(request, *args, **kwargs)
 
         else:
-            serializer = self.get_serializer(data=request.DATA, many=True)
+            serializer = self.get_serializer(data=request.data, many=True)
             if serializer.is_valid():
-                [self.pre_save(obj) for obj in serializer.object]
-                self.object = serializer.save(force_insert=True)
-                [self.post_save(obj, created=True) for obj in self.object]
+                self.perform_create(serializer)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 
 class BulkUpdateModelMixin(object):
@@ -50,22 +50,18 @@ class BulkUpdateModelMixin(object):
 
         # restrict the update to the filtered queryset
         serializer = self.get_serializer(self.filter_queryset(self.get_queryset()),
-                                         data=request.DATA,
+                                         data=request.data,
                                          many=True,
                                          partial=partial)
 
         if serializer.is_valid():
-            try:
-                [self.pre_save(obj) for obj in serializer.object]
-            except ValidationError as err:
-                # full_clean on model instances may be called in pre_save
-                # so we have to handle eventual errors.
-                return Response(err.message_dict, status=status.HTTP_400_BAD_REQUEST)
-            self.object = serializer.save(force_update=True)
-            [self.post_save(obj, created=False) for obj in self.object]
+            self.perform_update(serializer)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        serializer.save()
 
     def partial_bulk_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
